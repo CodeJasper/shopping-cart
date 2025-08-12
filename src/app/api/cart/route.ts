@@ -1,7 +1,7 @@
 import { products } from "../productsData";
 import { ShoppingCart } from "../types";
 
-let cart: ShoppingCart = { products: [] };
+const cart: ShoppingCart = { products: [] };
 
 export async function GET() {
   return Response.json(cart);

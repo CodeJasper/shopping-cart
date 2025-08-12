@@ -81,7 +81,7 @@ export default function Cart() {
       ) : cart && cart.products.length > 0 ? (
         <>
           <ul>
-            {cart.products.map((product, index) => (
+            {cart.products.map((product) => (
               <li key={product.id} className="mb-2">
                 <div className="gap-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b p-2">
                   <div className="gap-4 md:gap-8 flex flex-col md:flex-row items-start md:items-center">
