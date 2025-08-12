@@ -97,7 +97,7 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <>
       <h1 className="text-2xl font-bold mb-4">Products</h1>
       <FilterForm 
         handleSubmitFilter={handleSubmitFilter}
@@ -114,6 +114,6 @@ export default function Home() {
         productIsSelected={productIsSelected}
         selectProduct={selectProduct}
       />
-    </div>
+    </>
   );
 }
