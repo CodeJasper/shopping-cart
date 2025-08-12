@@ -4,6 +4,11 @@ export type Product = {
     price: number;
 }
 
+export type CartProduct = Product & {
+    quantity: number;
+    totalPrice: number;
+}
+
 export type ShoppingCart = {
-    products: Product[];
+    products: CartProduct[];
 }
