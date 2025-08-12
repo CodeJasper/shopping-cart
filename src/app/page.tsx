@@ -1,11 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Product } from "./api/types";
+import FilterForm from "@/components/FilterForm";
+import ProductList from "@/components/ProductsList";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
-  const [products, setProducts] = useState<Product[]>([]);
+  const productsRef = useRef<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [selectedProductsIds, setSelectedProductsIds] = useState<number[]>([]);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -15,7 +19,8 @@ export default function Home() {
         return;
       }
       const data = await response.json();
-      setProducts(data);
+      productsRef.current = data;
+      setFilteredProducts(data);
       setIsLoading(false);
     }
     fetchProducts();
@@ -31,27 +36,84 @@ export default function Home() {
     });
   };
 
+  const toggleSelectAll = () => {
+    if (selectedProductsIds.length === productsRef.current.length) {
+      setSelectedProductsIds([]);
+    } else {
+      setSelectedProductsIds(productsRef.current.map(p => p.id));
+    }
+  };
+
+  const productIsSelected = (productId: number) => {
+    return selectedProductsIds.includes(productId);
+  };
+
+  const selectProduct = (productId: number) => {
+    setSelectedProductsIds((prev) => {
+      if (prev.includes(productId)) {
+        return prev.filter((id) => id !== productId);
+      } else {
+        return [...prev, productId];
+      }
+    });
+  };
+
+  const findBestCombination = (products: Product[], budget: number) => {
+    let productsCombination: Product[] = [];
+    let bestSum = 0;
+
+    function backtrack(index: number, combination: Product[], sum: number) {
+      if(sum <= budget && sum > bestSum) {
+          bestSum = sum;
+          productsCombination = [...combination];
+      }
+
+      if(index === products.length || sum > bestSum) return;
+
+      backtrack(index + 1, combination.concat(products[index]), sum + products[index].price);
+      backtrack(index + 1, combination, sum);
+    }
+
+    backtrack(0, [], 0);
+    return productsCombination; 
+  }
+
+  const handleClearFilter = () => {
+    setFilteredProducts(productsRef.current);
+    setSelectedProductsIds([]);
+  };    
+
+  const handleSubmitFilter = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const budget = formData.get("budget") as string;
+
+    if(budget) {
+      const selectedProductsData = productsRef.current.filter(p => selectedProductsIds.includes(p.id));
+      const bestCombination = findBestCombination(selectedProductsData, Number(budget))
+      setFilteredProducts(bestCombination)
+    }
+  }
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Products</h1>
-      {isLoading ? (        
-        <p>Loading...</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.map((product) => (
-            <div key={product.id} className="border p-4 rounded-lg">
-              <h2 className="text-lg font-semibold">{product.name}</h2>
-              <p className="text-gray-600">${product.price.toFixed(2)}</p>
-              <button
-                className="mt-2 bg-blue-500 text-white px-4 py-2 rounded text-xs hover:bg-blue-600 hover:cursor-pointer"
-                onClick={() => addProductToCart(product.id)}
-              >
-                Add to Cart
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      <FilterForm 
+        handleSubmitFilter={handleSubmitFilter}
+        handleClearFilter={handleClearFilter}
+        quantityProductsSelected={selectedProductsIds.length}
+      />
+      <ProductList
+        isLoading={isLoading}
+        productsRef={productsRef}
+        filteredProducts={filteredProducts}
+        selectedProductsIds={selectedProductsIds}
+        toggleSelectAll={toggleSelectAll}
+        addProductToCart={addProductToCart}
+        productIsSelected={productIsSelected}
+        selectProduct={selectProduct}
+      />
     </div>
   );
 }
