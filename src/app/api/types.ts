@@ -4,6 +4,6 @@ export type Product = {
     price: number;
 }
 
-export type Cart = {
+export type ShoppingCart = {
     products: Product[];
 }
