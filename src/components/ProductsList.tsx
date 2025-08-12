@@ -1,9 +1,9 @@
 import { Product } from "@/app/api/types";
-import { FormEvent } from "react";
+import { RefObject } from "react";
 
 type ProductListProps = {
   isLoading: boolean;
-  productsRef: React.MutableRefObject<Product[]>;
+  productsRef: RefObject<Product[]>;
   filteredProducts: Product[];
   selectedProductsIds: number[];
   toggleSelectAll: () => void;
@@ -38,7 +38,7 @@ export default function ProductList(props: ProductListProps) {
         onClick={toggleSelectAll}
         className="mt-2 mb-2 bg-blue-500 text-white px-4 py-2 rounded text-xs hover:bg-blue-600 hover:cursor-pointer"
       >
-        {selectedProductsIds.length === productsRef.current.length ? "unselect all" : "select all"}
+        {selectedProductsIds.length === productsRef.current.length ? "Unselect all" : "Select all"}
       </button>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredProducts.map((product) => (

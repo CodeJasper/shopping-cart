@@ -1,6 +1,7 @@
 "use client"
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { toast, Toaster } from "react-hot-toast";
 import { Product } from "./api/types";
 import FilterForm from "@/components/FilterForm";
 import ProductList from "@/components/ProductsList";
@@ -27,13 +28,18 @@ export default function Home() {
   }, []);
 
   const addProductToCart = async (id: number) => {
-    await fetch("/api/cart", {
+    const response = await fetch("/api/cart", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ id }),
     });
+
+    if(response.ok) {
+      console.log("Product added to cart");
+      toast.success("Producto agregado al carrito");
+    }
   };
 
   const toggleSelectAll = () => {
@@ -98,6 +104,17 @@ export default function Home() {
 
   return (
     <>
+      <Toaster 
+        toastOptions={{
+          success: {
+            duration: 1000,
+            style: {
+              background: '#9aeab7ff',
+              color: '#000',
+            }
+          },
+        }}
+      />
       <h1 className="text-2xl font-bold mb-4">Products</h1>
       <FilterForm 
         handleSubmitFilter={handleSubmitFilter}

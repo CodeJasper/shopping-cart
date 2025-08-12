@@ -26,7 +26,6 @@ export default function Cart() {
   };
 
   const showDefaultQuantityAgain = (e: FocusEvent<HTMLInputElement>, productId: number) => {
-    console.log(cart)
     const product = cart?.products.find(p => p.id === productId);
 
     if(product) {
@@ -52,7 +51,6 @@ export default function Cart() {
     }
 
     const updatedCart = await response.json();
-    console.log(updatedCart);
     setCart(updatedCart);
 
   }
